@@ -9,4 +9,4 @@ if __name__ == '__main__':
     while g.running:
         g.new()
 
-    pygame.quit()
+pygame.quit()

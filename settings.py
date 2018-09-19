@@ -3,6 +3,7 @@
 WIDTH = 360
 HEIGHT = 480
 FPS = 60
+FONT_NAME = 'arial'
 
 # PLayer settings
 

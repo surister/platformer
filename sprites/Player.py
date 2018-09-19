@@ -21,7 +21,6 @@ class Player(pygame.sprite.Sprite):
         self.vel = vector(0, 0)
         self.acc = vector(0, WORLD_ACC)
 
-
     def jump(self):
         self.rect.x += 1
         hits = pygame.sprite.spritecollide(self, self.game.platforms, False)
