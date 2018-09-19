@@ -26,7 +26,7 @@ while run:
 
     screen.fill(Color.BLUE)
 
-    pygame.display.flip()  # FLip the display once you have drawn
+    pygame.display.flip()  # Flip the display once you have drawn
 
 
 pygame.quit()
