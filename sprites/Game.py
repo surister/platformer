@@ -1,4 +1,7 @@
+import random
+
 import pygame
+
 from settings import WIDTH, HEIGHT, FPS, Color, PLATFORM_LIST
 from sprites import Player, Platforms
 
@@ -48,6 +51,22 @@ class Game:
             if hits:
                 self.player.pos.y = hits[0].rect.top + 1
                 self.player.vel.y = 0
+
+        if self.player.rect.top <= HEIGHT / 4:
+            self.player.pos.y += abs(self.player.vel.y)
+            for platform in self.platforms:
+                platform.rect.y += abs(self.player.vel.y)
+                if platform.rect.top > HEIGHT:
+                    platform.kill()
+
+        while len(self.platforms) < 6:
+            p = Platforms.BasePlatform(random.randrange(0, WIDTH - random.randrange(60, 100)),
+                                       0,
+                                       random.randrange(50, 100),
+                                       20
+                                       )
+            self.platforms.add(p)
+            self.all_sprites.add(p)
 
     def _events(self):
 

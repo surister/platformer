@@ -14,7 +14,9 @@ PLAYER_FRICTION = -0.12
 
 PLATFORM_LIST = [
     (0, HEIGHT - 40, WIDTH, 40),
-    (WIDTH / 2, 300, 30, 10)
+    (WIDTH / 2, 300, 30, 10),
+    (WIDTH / 3, 240, 40, 20),
+    (WIDTH / 4, 200, 50, 20)
 ]
 
 
