@@ -90,20 +90,40 @@ class Game:
 
     def _draw(self):
 
-        self.screen.fill(Color.BLACK)
+        self.screen.fill(Color.LIGHT_BLUE)
         self.all_sprites.draw(self.screen)
-        self.draw_text(str(self.score), 22, Color.WHITE, WIDTH - 25, 15)
+        self._draw_text(str(self.score), 22, Color.WHITE, WIDTH - 25, 15)
         pygame.display.flip()
 
     def show_start_screen(self):
-        pass
+
+        self.screen.fill(Color.LIGHT_PURPLE)
+        self._draw_text('JUEGO', 48, Color.WHITE, WIDTH / 2, HEIGHT / 4)
+        self._draw_text('Arrows to move, space to jump', 22, Color.RED, WIDTH / 2, HEIGHT * 3 / 4)
+        pygame.display.flip()
+        self._wait_for_key()
 
     def show_go_screen(self):
-        pass
+        self.screen.fill(Color.BLUE)
+        self._draw_text('game over', 48, Color.RED, WIDTH / 2, HEIGHT / 4)
+        self._draw_text('PUTO NOOB K HACES PERDIENDO', 20, Color.RED, WIDTH / 2, HEIGHT * 3 / 4)
+        pygame.display.flip()
+        self._wait_for_key()
 
-    def draw_text(self, text, size, color, x, y):
+    def _draw_text(self, text, size, color, x, y):
         font = pygame.font.Font(self.font, size)
         text_surface = font.render(text, True, color)
         text_rect = text_surface.get_rect()
         text_rect.midtop = (x, y)
         self.screen.blit(text_surface, text_rect)
+
+    def _wait_for_key(self):
+        waiting = True
+        while waiting:
+            self.clock.tick(FPS/2)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    waiting = False
+                    self.running = False
+                if event.type == pygame.KEYUP:
+                    waiting = False
