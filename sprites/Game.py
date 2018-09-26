@@ -1,23 +1,45 @@
 import random
 
+from os import path
+
 import pygame
 
-from settings import WIDTH, HEIGHT, FPS, Color, PLATFORM_LIST, FONT_NAME
-from sprites import Player, Platforms
+from settings import WIDTH, HEIGHT, FPS, Color, PLATFORM_LIST, FONT_NAME, HS_FILE, SPRITESHEET
+from sprites import Player, Platforms, art
 
 
 class Game:
 
     def __init__(self):
+        #  Basic flow control
         self.running = True
         self.playing = True
+
+        #  Basic pygame vars
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         self.clock = pygame.time.Clock()
         self.font = pygame.font.match_font(FONT_NAME)
 
+        # Basic py game initializations
         pygame.init()
         pygame.mixer.init()
-        pygame.display.set_caption('Test')
+        pygame.display.set_caption('SUPER JUEGO OMG')
+
+        # Paths
+        self.path = path.dirname(__file__)
+        self.highscore_path = path.join(self.path, HS_FILE)
+        self.spritesheet_path = path.join(self.path, SPRITESHEET)
+
+        self._load_data()
+
+    def _load_data(self):
+        with open(self.highscore_path, 'w') as f:
+            try:
+                self.highscore = int(f.read())
+            except:
+                self.highscore = 0
+
+        self.spritesheet = art.Sheet(self.spritesheet_path)
 
     def new(self):
         self.score = 0
@@ -37,7 +59,6 @@ class Game:
         self._run()
 
     def _run(self):
-        # Game loop
 
         while self.playing:
 
@@ -47,7 +68,7 @@ class Game:
             self._draw()
 
     def _update(self):
-        # Game loop - Update
+
         self.all_sprites.update()
         if self.player.vel.y > 0:
             hits = pygame.sprite.spritecollide(self.player, self.platforms, False)
@@ -98,16 +119,26 @@ class Game:
     def show_start_screen(self):
 
         self.screen.fill(Color.LIGHT_PURPLE)
-        self._draw_text('JUEGO', 48, Color.WHITE, WIDTH / 2, HEIGHT / 4)
+        self._draw_text('super juego increible', 25, Color.WHITE, WIDTH / 2, HEIGHT / 4)
         self._draw_text('Arrows to move, space to jump', 22, Color.RED, WIDTH / 2, HEIGHT * 3 / 4)
+        self._draw_text(f'Higher score: {self.highscore}', 10, Color.GREEN, WIDTH / 2, HEIGHT / 2)
         pygame.display.flip()
         self._wait_for_key()
 
     def show_go_screen(self):
+        if not self.running:
+            return
+
         self.screen.fill(Color.BLUE)
         self._draw_text('game over', 48, Color.RED, WIDTH / 2, HEIGHT / 4)
         self._draw_text('PUTO NOOB K HACES PERDIENDO', 20, Color.RED, WIDTH / 2, HEIGHT * 3 / 4)
+        self._draw_text(f'You score score: {self.score}', 10, Color.GREEN, WIDTH / 2, HEIGHT / 2)
+
         pygame.display.flip()
+        if self.score > self.highscore:
+            with open(f'{self.path}/{HS_FILE}', 'w') as f:
+                f.write(str(self.score))
+
         self._wait_for_key()
 
     def _draw_text(self, text, size, color, x, y):

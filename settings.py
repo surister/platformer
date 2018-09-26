@@ -4,7 +4,8 @@ WIDTH = 360
 HEIGHT = 480
 FPS = 60
 FONT_NAME = 'arial'
-
+HS_FILE = "highscore.txt"
+SPRITESHEET = 'assets/spritesheet_jumper.png'
 # PLayer settings
 
 PLAYER_ACC = 0.5
