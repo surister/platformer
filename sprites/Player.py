@@ -41,9 +41,13 @@ class Player(pygame.sprite.Sprite):
         self.walking_frames_r = (self.game.spritesheet.get_image(x=678, y=860, width=120, height=201),
                                self.game.spritesheet.get_image(x=692, y=1458, width=120, height=207))
 
-        self.walk_frames_l = [pygame.transform.flip(frame, True, False) for frame in self.walking_frames_r]
+        self.walking_frames_l = [pygame.transform.flip(frame, True, False) for frame in self.walking_frames_r]
 
         self.jumping_frame = [self.game.spritesheet.get_image(x=382, y=763, width=150, height=181)]
+
+        for frame_r, frame_l in self.walking_frames_r, self.walking_frames_l:
+            frame_r.set_colorkey(Color.BLACK)
+            frame_l.set_colorkey(Color.BLACK)
 
     def jump(self):
         self.rect.x += 1
@@ -57,6 +61,8 @@ class Player(pygame.sprite.Sprite):
 
         self.acc.x = 0
 
+        #MOVEMENT STUFF
+
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_LEFT]:
@@ -65,8 +71,15 @@ class Player(pygame.sprite.Sprite):
             self.acc.x = PLAYER_ACC
         if keys[pygame.K_SPACE]:
             self.jump()
+
+        #  FRICTION
         self.acc.x += self.vel.x * PLAYER_FRICTION
+
+        #  MOTION
+
         self.vel += self.acc
+        if abs(self.vel.x) < 0.1:
+            self.vel.x = 0
         self.pos += self.vel + 0.5 * self.acc
 
         if self.pos.x > WIDTH:
@@ -78,6 +91,25 @@ class Player(pygame.sprite.Sprite):
 
     def animate(self):
         now = pygame.time.get_ticks()
+
+        if self.vel.x != 0:
+            self.walking = True
+        else:
+            self.walking = False
+
+        if self.walking:
+            if now - self.last_update > 200:
+                self.last_update = now
+
+                self.current_frame = (self.current_frame + 1) % len(self.walking_frames_r)
+                if self.vel.x > 0:
+                    self.image = self.walking_frames_r[self.current_frame]
+                else:
+                    self.image= self.walking_frames_l[self.current_frame]
+
+                bottom = self.rect.bottom
+                self.rect = self.image.get_rect()
+                self.rect.bottom = bottom
 
         if not self.jumping and not self.walking:
             if now - self.last_update > 350:
