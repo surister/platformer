@@ -25,7 +25,7 @@ class Player(pygame.sprite.Sprite):
 
         self.rect = self.image.get_rect()
 
-        self.pos = vector(WIDTH / 2, HEIGHT / 2)
+        self.pos = vector(30, HEIGHT)
         self.vel = vector(0, 0)
         self.acc = vector(0, WORLD_ACC)
 
@@ -50,11 +50,11 @@ class Player(pygame.sprite.Sprite):
             frame_l.set_colorkey(Color.BLACK)
 
     def jump(self):
-        self.rect.x += 1
+        self.rect.x += 2
         hits = pygame.sprite.spritecollide(self, self.game.platforms, False)
-        self.rect.x -= 1
+        self.rect.x -= 2
         if hits:
-            self.vel.y = -15
+            self.vel.y = -13
 
     def update(self):
         self.animate()
@@ -82,10 +82,10 @@ class Player(pygame.sprite.Sprite):
             self.vel.x = 0
         self.pos += self.vel + 0.5 * self.acc
 
-        if self.pos.x > WIDTH:
-            self.pos.x = 0
-        if self.pos.x < 0:
-            self.pos.x = WIDTH
+        if self.pos.x > WIDTH + self.rect.width / 2:
+            self.pos.x = 0 - self.rect.width / 2
+        if self.pos.x < 0 - self.rect.width / 2:
+            self.pos.x = WIDTH + self.rect.width / 2
 
         self.rect.midbottom = self.pos
 

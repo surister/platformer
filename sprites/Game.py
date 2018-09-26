@@ -51,7 +51,8 @@ class Game:
         self.player = Player.Player(self)
 
         for platform in PLATFORM_LIST:
-            p = Platforms.BasePlatform(*platform)
+
+            p = Platforms.BasePlatform(*platform, self, 'small_grass')
             self.all_sprites.add(p)
             self.platforms.add(p)
 
@@ -78,9 +79,9 @@ class Game:
                 self.player.vel.y = 0
 
         if self.player.rect.top <= HEIGHT / 4:
-            self.player.pos.y += abs(self.player.vel.y)
+            self.player.pos.y += max(abs(self.player.vel.y), 2)
             for platform in self.platforms:
-                platform.rect.y += abs(self.player.vel.y)
+                platform.rect.y += max(abs(self.player.vel.y), 2)
                 if platform.rect.top >= HEIGHT:
                     platform.kill()
                     self.score += 10
@@ -94,11 +95,10 @@ class Game:
         if len(self.platforms) == 0:
             self.playing = False
 
-        while len(self.platforms) < 4:
-            p = Platforms.BasePlatform(random.randrange(0, WIDTH - random.randrange(60, 100)), 0,
-                                       random.randrange(50, 100), 20)
-            self.platforms.add(p)
-            self.all_sprites.add(p)
+        # while len(self.platforms) < 4:
+        #     p = Platforms.BasePlatform(random.randrange(0, WIDTH - random.randrange(60, 100)), 0, self)
+        #     self.platforms.add(p)
+        #     self.all_sprites.add(p)
 
     def _events(self):
 
@@ -112,6 +112,7 @@ class Game:
         self.screen.fill(Color.LIGHT_BLUE)
         self.all_sprites.draw(self.screen)
         self._draw_text(str(self.score), 22, Color.WHITE, WIDTH - 25, 15)
+        self.screen.blit(self.player.image, self.player.rect) # makes the player to be in front of the platform
         pygame.display.flip()
 
     def show_start_screen(self):
