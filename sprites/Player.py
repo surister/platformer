@@ -15,8 +15,11 @@ class Player(pygame.sprite.Sprite):
 
         self.game = game
 
+        self.can_move = True
         self.walking = False
         self.jumping = False
+        self.down = False
+
         self.current_frame = 0
         self.last_update = 0
 
@@ -41,9 +44,13 @@ class Player(pygame.sprite.Sprite):
         self.walking_frames_r = (self.game.spritesheet.get_image(x=678, y=860, width=120, height=201),
                                self.game.spritesheet.get_image(x=692, y=1458, width=120, height=207))
 
-        self.walking_frames_l = [pygame.transform.flip(frame, True, False) for frame in self.walking_frames_r]
+        self.walking_frames_l = [pygame.transform.flip(frame, True, False)
+                                 for frame in self.walking_frames_r]
 
-        self.jumping_frame = [self.game.spritesheet.get_image(x=382, y=763, width=150, height=181)]
+        self.jumping_frame = [self.game.spritesheet.get_image(x=382, y=763, width=150, height=181),
+                              self.game.spritesheet.get_image(690, 406, 120, 201)]
+
+        self.down_frame = [self.game.spritesheet.get_image(x=382, y=763, width=150, height=181)]
 
         for frame_r, frame_l in self.walking_frames_r, self.walking_frames_l:
             frame_r.set_colorkey(Color.BLACK)
@@ -54,6 +61,7 @@ class Player(pygame.sprite.Sprite):
         hits = pygame.sprite.spritecollide(self, self.game.platforms, False)
         self.rect.x -= 2
         if hits:
+            self.jumping = True
             self.vel.y = -13
 
     def update(self):
@@ -63,15 +71,21 @@ class Player(pygame.sprite.Sprite):
 
         #MOVEMENT STUFF
 
-        keys = pygame.key.get_pressed()
+        self.keys = pygame.key.get_pressed()
 
-        if keys[pygame.K_LEFT]:
-            self.acc.x = -PLAYER_ACC
-        if keys[pygame.K_RIGHT]:
-            self.acc.x = PLAYER_ACC
-        if keys[pygame.K_SPACE]:
-            self.jump()
-
+        if self.can_move:
+            if self.keys[pygame.K_LEFT]:
+                self.acc.x = -PLAYER_ACC
+            if self.keys[pygame.K_RIGHT]:
+                self.acc.x = PLAYER_ACC
+            if self.keys[pygame.K_SPACE]:
+                self.jump()
+        if self.keys[pygame.K_DOWN]:
+            self.down = True
+            self.can_move = False
+        else:
+            self.down = False
+            self.can_move = True
         #  FRICTION
         self.acc.x += self.vel.x * PLAYER_FRICTION
 
@@ -89,6 +103,14 @@ class Player(pygame.sprite.Sprite):
 
         self.rect.midbottom = self.pos
 
+    def _stick_player(self):
+        """We redefine the players position in every animation so it sticks regardless of the
+        new players frame"""
+
+        bottom = self.rect.bottom
+        self.rect = self.image.get_rect()
+        self.rect.bottom = bottom
+
     def animate(self):
         now = pygame.time.get_ticks()
 
@@ -97,7 +119,7 @@ class Player(pygame.sprite.Sprite):
         else:
             self.walking = False
 
-        if self.walking:
+        if self.walking and not self.jumping:
             if now - self.last_update > 200:
                 self.last_update = now
 
@@ -105,11 +127,9 @@ class Player(pygame.sprite.Sprite):
                 if self.vel.x > 0:
                     self.image = self.walking_frames_r[self.current_frame]
                 else:
-                    self.image= self.walking_frames_l[self.current_frame]
+                    self.image = self.walking_frames_l[self.current_frame]
 
-                bottom = self.rect.bottom
-                self.rect = self.image.get_rect()
-                self.rect.bottom = bottom
+                self._stick_player()
 
         if not self.jumping and not self.walking:
             if now - self.last_update > 350:
@@ -119,6 +139,18 @@ class Player(pygame.sprite.Sprite):
 
                 self.image = self.standing_frames[self.current_frame]
 
-                bottom = self.rect.bottom
-                self.rect = self.image.get_rect()
-                self.rect.bottom = bottom
+                self._stick_player()
+
+        if self.jumping:
+
+            if now - self.last_update > 100:
+                self.last_update = now
+
+                self.current_frame = (self.current_frame + 1) % len(self.jumping_frame)
+                self.image = self.jumping_frame[self.current_frame]
+                self.jumping = False
+
+                self._stick_player()
+        if self.down:
+            self.image = self.down_frame[0]
+            self._stick_player()

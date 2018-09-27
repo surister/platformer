@@ -140,8 +140,6 @@ class Game:
 
     def _save_score(self):
         if self.score > self.highscore:
-            print(self.score)
-            print(self.highscore)
             with open(f'{self.path}/{HS_FILE}', 'w') as f:
                 f.write(str(self.score))
 

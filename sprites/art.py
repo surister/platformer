@@ -1,5 +1,5 @@
 import pygame
-
+from settings import Color
 
 class Sheet:
 
@@ -14,4 +14,5 @@ class Sheet:
         image = pygame.Surface((width, height))
         image.blit(self.spritesheet, (0, 0), (x, y, width, height))
         image = pygame.transform.scale(image, (width // self.ratio, height // self.ratio))
+        image.set_colorkey(Color.BLACK)
         return image
