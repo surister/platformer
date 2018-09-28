@@ -40,6 +40,7 @@ class Game:
                 self.highscore = 0
 
         self.spritesheet = art.Sheet(self.spritesheet_path)
+        #self.picture = art.Image('test')
 
     def new(self):
         self.score = 0
@@ -49,7 +50,7 @@ class Game:
 
         self.player = Player.Player(self)
         self.hitbox = hitbox.HitBox(self.player)
-        self.object = hitbox.Mob()
+        #self.object = hitbox.Mob(self)
         for platform in PLATFORM_LIST:
 
             p = Platforms.BasePlatform(*platform, self, 'small_grass')
@@ -59,8 +60,8 @@ class Game:
         self.all_sprites.add(self.player)
         self.all_sprites.add(self.hitbox)
         self.mobs = pygame.sprite.Group()
-        self.all_sprites.add(self.object)
-        self.mobs.add(self.object)
+        #self.all_sprites.add(self.object)
+        #self.mobs.add(self.object)
         self._run()
 
     def _run(self):
@@ -77,9 +78,6 @@ class Game:
         self.all_sprites.update()
         if self.player.vel.y > 0:
             hits = pygame.sprite.spritecollide(self.hitbox, self.platforms, False)
-            leon_hits = pygame.sprite.spritecollide(self.hitbox, self.mobs, False)
-            if leon_hits:
-                self.show_go_screen()
 
             if hits:
                 lowest = hits[0]

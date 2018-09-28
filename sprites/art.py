@@ -21,7 +21,15 @@ class Sheet:
 
 class Image:
 
-    def __init__(self):
-        self.picture = pygame.image.load('/home/surister/pygame/sprites/assets/leon.png').convert()
-        image = pygame.Surface((100, 100))
-        image.blit(self.picture, (0, 0))
+    def __init__(self, fn):
+
+        self.spritesheet = pygame.image.load(fn).convert()
+        self.ratio = 3
+
+    def get_image(self, width, height):
+
+        image = pygame.Surface((width, height))
+        image.blit(self.spritesheet, (0, 0))
+        image = pygame.transform.scale(image, (width // self.ratio, height // self.ratio))
+        image.set_colorkey(Color.BLACK)
+        return image
