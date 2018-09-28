@@ -5,7 +5,7 @@ from os import path
 import pygame
 
 from settings import WIDTH, HEIGHT, FPS, Color, PLATFORM_LIST, FONT_NAME, HS_FILE, SPRITESHEET
-from sprites import Player, Platforms, art
+from sprites import Player, Platforms, art, hitbox
 
 
 class Game:
@@ -37,7 +37,6 @@ class Game:
             try:
                 self.highscore = int(f.read())
             except Exception as e:
-                print(e)
                 self.highscore = 0
 
         self.spritesheet = art.Sheet(self.spritesheet_path)
@@ -49,7 +48,8 @@ class Game:
         self.platforms = pygame.sprite.Group()
 
         self.player = Player.Player(self)
-
+        self.hitbox = hitbox.HitBox(self.player)
+        self.object = hitbox.Mob()
         for platform in PLATFORM_LIST:
 
             p = Platforms.BasePlatform(*platform, self, 'small_grass')
@@ -57,7 +57,10 @@ class Game:
             self.platforms.add(p)
 
         self.all_sprites.add(self.player)
-
+        self.all_sprites.add(self.hitbox)
+        self.mobs = pygame.sprite.Group()
+        self.all_sprites.add(self.object)
+        self.mobs.add(self.object)
         self._run()
 
     def _run(self):
@@ -73,11 +76,21 @@ class Game:
 
         self.all_sprites.update()
         if self.player.vel.y > 0:
-            hits = pygame.sprite.spritecollide(self.player, self.platforms, False)
-            if hits:
-                self.player.pos.y = hits[0].rect.top + 1
-                self.player.vel.y = 0
+            hits = pygame.sprite.spritecollide(self.hitbox, self.platforms, False)
+            leon_hits = pygame.sprite.spritecollide(self.hitbox, self.mobs, False)
+            if leon_hits:
+                self.show_go_screen()
 
+            if hits:
+                lowest = hits[0]
+                for hit in hits:
+                    if hit.rect.bottom < lowest.rect.bottom:
+                        lowest = hit
+
+                if self.player.pos.y < lowest.rect.centery:
+                    self.player.pos.y = lowest.rect.top + 1
+                    self.player.vel.y = 0
+                    self.player.jumping = False
         if self.player.rect.top <= HEIGHT / 4:
             self.player.pos.y += max(abs(self.player.vel.y), 2)
             for platform in self.platforms:
@@ -108,11 +121,11 @@ class Game:
                 self.playing = False
 
     def _draw(self):
-
         self.screen.fill(Color.LIGHT_BLUE)
         self.all_sprites.draw(self.screen)
         self._draw_text(str(self.score), 22, Color.WHITE, WIDTH - 25, 15)
-        self.screen.blit(self.player.image, self.player.rect) # makes the player to be in front of the platform
+        self._draw_text(f'{round(self.clock.get_fps(), 2)}', 22, Color.WHITE, 35, 15)
+        self.screen.blit(self.player.image, self.player.rect)  # makes the player to be in front of the platform
         pygame.display.flip()
 
     def show_start_screen(self):
@@ -129,8 +142,7 @@ class Game:
             return
 
         self.screen.fill(Color.BLUE)
-        self._draw_text('game over', 48, Color.RED, WIDTH / 2, HEIGHT / 4)
-        self._draw_text('PUTO NOOB K HACES PERDIENDO', 20, Color.RED, WIDTH / 2, HEIGHT * 3 / 4)
+        self._draw_text('YOU ARE DEAD', 48, Color.RED, WIDTH / 2, HEIGHT / 4)
         self._draw_text(f'You score score: {self.score}', 10, Color.GREEN, WIDTH / 2, HEIGHT / 2)
 
         pygame.display.flip()
@@ -160,3 +172,4 @@ class Game:
                     self.running = False
                 if event.type == pygame.KEYUP:
                     waiting = False
+

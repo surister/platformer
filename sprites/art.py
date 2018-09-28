@@ -1,6 +1,7 @@
 import pygame
 from settings import Color
 
+
 class Sheet:
 
     def __init__(self, fn):
@@ -16,3 +17,11 @@ class Sheet:
         image = pygame.transform.scale(image, (width // self.ratio, height // self.ratio))
         image.set_colorkey(Color.BLACK)
         return image
+
+
+class Image:
+
+    def __init__(self):
+        self.picture = pygame.image.load('/home/surister/pygame/sprites/assets/leon.png').convert()
+        image = pygame.Surface((100, 100))
+        image.blit(self.picture, (0, 0))
