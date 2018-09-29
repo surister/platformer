@@ -1,10 +1,8 @@
+import pygame
 import random
-
 from os import path
 
-import pygame
-
-from settings import WIDTH, HEIGHT, FPS, Color, PLATFORM_LIST, FONT_NAME, HS_FILE, SPRITESHEET
+from settings import WIDTH, HEIGHT, FPS, Color, PLATFORM_LIST, FONT_NAME, HS_FILE, SPRITESHEET, WORLD_ACC
 from sprites import Player, Platforms, art, hitbox
 
 
@@ -29,6 +27,8 @@ class Game:
         self.path = path.dirname(__file__)
         self.highscore_path = path.join(self.path, HS_FILE)
         self.spritesheet_path = path.join(self.path, SPRITESHEET)
+        self.test_path = path.join(self.path, 'assets/new.png')
+        self.snd_path = path.join(self.path, 'snd')
 
         self._load_data()
 
@@ -38,30 +38,28 @@ class Game:
                 self.highscore = int(f.read())
             except Exception as e:
                 self.highscore = 0
-
+        self.jump_sound = pygame.mixer.Sound(path.join(self.snd_path, 'jump.wav'))
         self.spritesheet = art.Sheet(self.spritesheet_path)
+        self.new_spritesheet = art.Image(self.test_path)
+
         #self.picture = art.Image('test')
 
     def new(self):
         self.score = 0
         self.playing = True
+
         self.all_sprites = pygame.sprite.Group()
         self.platforms = pygame.sprite.Group()
+        self.powerups = pygame.sprite.Group()
+        self.mobs = pygame.sprite.Group()
 
         self.player = Player.Player(self)
-        self.hitbox = hitbox.HitBox(self.player)
-        #self.object = hitbox.Mob(self)
+        self.hitbox = hitbox.HitBox(self, self.player)
+
         for platform in PLATFORM_LIST:
 
-            p = Platforms.BasePlatform(*platform, self, 'small_grass')
-            self.all_sprites.add(p)
-            self.platforms.add(p)
+            Platforms.BasePlatform(*platform, game=self, _type=2)
 
-        self.all_sprites.add(self.player)
-        self.all_sprites.add(self.hitbox)
-        self.mobs = pygame.sprite.Group()
-        #self.all_sprites.add(self.object)
-        #self.mobs.add(self.object)
         self._run()
 
     def _run(self):
@@ -89,6 +87,7 @@ class Game:
                     self.player.pos.y = lowest.rect.top + 1
                     self.player.vel.y = 0
                     self.player.jumping = False
+                    self.player.acc.y = WORLD_ACC
         if self.player.rect.top <= HEIGHT / 4:
             self.player.pos.y += max(abs(self.player.vel.y), 2)
             for platform in self.platforms:
@@ -106,10 +105,8 @@ class Game:
         if len(self.platforms) == 0:
             self.playing = False
 
-        # while len(self.platforms) < 4:
-        #     p = Platforms.BasePlatform(random.randrange(0, WIDTH - random.randrange(60, 100)), 0, self)
-        #     self.platforms.add(p)
-        #     self.all_sprites.add(p)
+        while len(self.platforms) < 4:
+            Platforms.BasePlatform(random.randrange(0, WIDTH - random.randrange(60, 100)), 0, self, random.randint(1, 2))
 
     def _events(self):
 
@@ -117,6 +114,9 @@ class Game:
             if event.type == pygame.QUIT:
                 self.running = False
                 self.playing = False
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_SPACE:
+                    self.player.jump_cut()
 
     def _draw(self):
         self.screen.fill(Color.LIGHT_BLUE)
@@ -170,4 +170,3 @@ class Game:
                     self.running = False
                 if event.type == pygame.KEYUP:
                     waiting = False
-

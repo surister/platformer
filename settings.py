@@ -11,7 +11,8 @@ SPRITESHEET = 'assets/spritesheet_jumper.png'
 PLAYER_ACC = 0.5
 WORLD_ACC = 0.5
 PLAYER_FRICTION = -0.12
-
+PLAYER_JUMP = -15
+POW_S = 40
 # Platform list
 
 PLATFORM_LIST = [(0, HEIGHT - 40),

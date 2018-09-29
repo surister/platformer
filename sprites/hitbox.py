@@ -4,14 +4,15 @@ from settings import Color
 
 class HitBox(pygame.sprite.Sprite):
 
-    def __init__(self, player):
-        pygame.sprite.Sprite.__init__(self)
-        self.player = player
+    def __init__(self, game, player):
 
+        super().__init__()
+        self.player = player
+        self.game = game
+        self.add(self.game.all_sprites)
         self.image = pygame.Surface((self.player.feet.width, self.player.feet.height))
         self.rect = self.image.get_rect()
         self.rect.midbottom = self.player.rect.midbottom
-        self.image.set_colorkey(Color.BLACK)
 
     def update(self):
         self.rect.midbottom = self.player.rect.midbottom

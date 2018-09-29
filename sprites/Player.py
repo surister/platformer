@@ -1,5 +1,5 @@
 import pygame
-from settings import Color, WIDTH, HEIGHT, PLAYER_ACC, WORLD_ACC, PLAYER_FRICTION
+from settings import Color, WIDTH, HEIGHT, PLAYER_ACC, WORLD_ACC, PLAYER_FRICTION, PLAYER_JUMP
 
 
 def vector(*args):
@@ -11,14 +11,13 @@ class Player(pygame.sprite.Sprite):
     __slots__ = ['game']
 
     def __init__(self, game):
-        pygame.sprite.Sprite.__init__(self)
+        super().__init__()
 
         self.game = game
+        self.add(self.game.all_sprites)
 
         self.can_move = True
-        self.walking = False
-        self.jumping = False
-        self.down = False
+        self.walking = self.jumping = self.down = False
 
         self.current_frame = 0
         self.last_update = 0
@@ -30,7 +29,6 @@ class Player(pygame.sprite.Sprite):
         self.feet = self.rect.copy().inflate(-15, -30)
 
         self.pos = vector(30, HEIGHT - 30)
-
         self.vel = vector(0, 0)
         self.acc = vector(0, WORLD_ACC)
 
@@ -45,18 +43,23 @@ class Player(pygame.sprite.Sprite):
         self.walking_frames_l = [pygame.transform.flip(frame, True, False)
                                  for frame in self.walking_frames_r]
 
-        self.jumping_frame = (self.game.spritesheet.get_image(x=382, y=763, width=150, height=181),
-                              self.game.spritesheet.get_image(690, 406, 120, 201))
+        self.jumping_frame = self.game.spritesheet.get_image(x=382, y=763, width=150, height=181)
 
-        self.down_frame = [self.game.spritesheet.get_image(x=382, y=763, width=150, height=181)]
+        self.down_frame = self.game.spritesheet.get_image(x=382, y=763, width=150, height=181)
 
     def jump(self):
         self.rect.x += 2
         hits = pygame.sprite.spritecollide(self, self.game.platforms, False)
         self.rect.x -= 2
         if hits and not self.jumping:
+            #self.game.jump_sound.play()
             self.jumping = True
-            self.vel.y = -11
+            self.vel.y = PLAYER_JUMP
+
+    def jump_cut(self):
+        if self.jumping:
+            if self.vel.y < -3:
+                self.vel.y = -4
 
     def update(self):
         self.animate()
@@ -71,13 +74,17 @@ class Player(pygame.sprite.Sprite):
             if self.keys[pygame.K_RIGHT]:
                 self.acc.x = PLAYER_ACC
             if self.keys[pygame.K_SPACE]:
+                if not self.jumping:
+                    pass
+                    #  self.game.jump_sound.play()
                 self.jump()
+
         if self.keys[pygame.K_DOWN]:
             self.acc.y = 1.4
             self.down = True
             self.can_move = False
         else:
-            self.acc.y = 0.5
+            self.acc.y = WORLD_ACC
             self.down = False
             self.can_move = True
 
@@ -89,7 +96,7 @@ class Player(pygame.sprite.Sprite):
         self.vel += self.acc
         if abs(self.vel.x) < 0.1:
             self.vel.x = 0
-        self.pos += self.vel + 0.5 * self.acc
+        self.pos += self.vel + WORLD_ACC * self.acc
 
         if self.pos.x > WIDTH + self.rect.width / 2:
             self.pos.x = 0 - self.rect.width / 2
@@ -139,14 +146,10 @@ class Player(pygame.sprite.Sprite):
 
         if self.jumping:
 
-            if now - self.last_update > 200:
-                self.last_update = now
+            self.image = self.jumping_frame
 
-                self.current_frame = (self.current_frame + 1) % len(self.jumping_frame)
-                self.image = self.jumping_frame[self.current_frame]
-
-                self._stick_player()
+            self._stick_player()
 
         if self.down:
-            self.image = self.down_frame[0]
+            self.image = self.down_frame
             self._stick_player()
