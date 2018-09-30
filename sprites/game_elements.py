@@ -2,7 +2,7 @@ import pygame
 
 from random import choice, randrange
 
-from settings import POW_S, Color
+from settings import POW_S, Color, WIDTH, HEIGHT
 
 
 class PowerUp(pygame.sprite.Sprite):
@@ -60,17 +60,46 @@ class BasePlatform(pygame.sprite.Sprite):
 
 class Mob(pygame.sprite.Sprite):
 
-    def __init__(self, game, x, y):
+    def __init__(self, game,):
         pygame.sprite.Sprite.__init__(self)
         self.add(game.all_sprites, game.mobs)
         self.game = game
 
-        self.image = self.game.picture.get_image()
+        self._load_images()
+
+        self.image = self.flying_frame[0]
         self.rect = self.image.get_rect()
-        self.rect.midbottom((x, y))
+        self.rect.centerx = choice([-100, WIDTH + 100])
+
+        self.vx = randrange(1, 4)
+        if self.rect.centerx > WIDTH:
+            self.vx *= -1
+
+        self.rect.y = randrange(HEIGHT / 2)
+
+        self.vy = 0
+        self.dy = 0.5
+
+        self.current_frame = 0
+        self.last_update = 0
 
     def update(self):
-        pass
+
+        self.rect.x += self.vx
+        self.vy += self.dy
+        if self.vy > 3 or self.vy < -3:
+            self.dy *= -1
+        center = self.rect.center
+
+        self.rect = self.image.get_rect()
+        self.rect.center = center
+        self.rect.y += self.vy
+
+        if self.rect.left > WIDTH + 100 or self.rect.right < -100:
+            self.kill()
+
+        self._animate()
+        self.mask = pygame.mask.from_surface(self.image)
 
     def _load_images(self):
         self.flying_frame = [
@@ -81,3 +110,11 @@ class Mob(pygame.sprite.Sprite):
             self.game.spritesheet.get_image(382, 510, 182, 123)
             ]
 
+    def _animate(self):
+        now = pygame.time.get_ticks()
+
+        if now - self.last_update > 100:
+            self.last_update = now
+
+            self.current_frame = (self.current_frame + 1) % len(self.flying_frame)
+            self.image = self.flying_frame[self.current_frame]

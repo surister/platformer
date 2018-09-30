@@ -63,6 +63,8 @@ class Player(pygame.sprite.Sprite):
 
     def update(self):
         self._animate()
+        self.mask = pygame.mask.from_surface(self.image)
+
         self.acc.x = 0
 
         #  MOVEMENT STUFF

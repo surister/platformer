@@ -12,7 +12,7 @@ class Game:
         #  Basic flow control
         self.running = True
         self.playing = True
-
+        self.mob_timer = 0
         #  Basic pygame vars
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         self.clock = pygame.time.Clock()
@@ -44,7 +44,7 @@ class Game:
         self.score = 0
         self.playing = True
 
-        self.all_sprites = pygame.sprite.Group()
+        self.all_sprites = pygame.sprite.LayeredUpdates()  # group that lets you specify the order sprites are drawn
         self.platforms = pygame.sprite.Group()
         self.powerups = pygame.sprite.Group()
         self.mobs = pygame.sprite.Group()
@@ -70,6 +70,11 @@ class Game:
     def _update(self):
 
         self.all_sprites.update()
+        now = pygame.time.get_ticks()
+
+        if now - self.mob_timer > 6000:
+            self.mob_timer = now
+            game_elements.Mob(self)
 
         #  Platform collision, TODO: see why sometimes when going down it won't detect collision.
         if self.player.vel.y > 0:
@@ -86,13 +91,15 @@ class Game:
                     self.player.vel.y = 0
                     self.player.jumping = False
                     self.player.acc.y = WORLD_ACC
+        # hits = pygame.sprite.spritecollide(self.player, self.mobs, False, pygame.sprite.collide_mask)
+
         # Powerups collision.
         powerups_hits = pygame.sprite.spritecollide(self.player, self.powerups, True)
-        for pow in powerups_hits:
-            if pow.type == 'boost':
+        for powerup in powerups_hits:
+            if powerup.type == 'boost':
                 self.player.vel.y = -POW_STR
                 self.player.jumping = False
-        #  platforms moving up
+        #  platforms moving up if we reach 1/4 height (up)
         if self.player.rect.top <= HEIGHT / 4:
             self.player.pos.y += max(abs(self.player.vel.y), 2)
             for platform in self.platforms:
@@ -100,6 +107,9 @@ class Game:
                 if platform.rect.top >= HEIGHT:
                     platform.kill()
                     self.score += 10
+
+            for mob in self.mobs:
+                mob.rect.y += max(abs(self.player.vel.y), 2)
 
         if self.player.rect.bottom > HEIGHT:
             for sprite in self.all_sprites:
@@ -111,7 +121,8 @@ class Game:
             self.playing = False
 
         while len(self.platforms) < 4:
-            game_elements.BasePlatform(random.randrange(0, WIDTH - random.randrange(60, 100)), 0, self, random.randint(1, 2))
+            game_elements.BasePlatform(random.randrange(0, WIDTH - random.randrange(60, 100)),
+                                       0, self, random.randint(1, 2))
 
     def _events(self):
 
@@ -121,7 +132,7 @@ class Game:
                 self.playing = False
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_SPACE:
-                    self.player.jump_cut() # TODO PUt this in to player, not GAME
+                    self.player.jump_cut()  # TODO PUt this in to player, not GAME
 
     def _draw(self):
         self.screen.fill(Color.LIGHT_BLUE)
