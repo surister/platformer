@@ -11,6 +11,7 @@ class HitBox(pygame.sprite.Sprite):
         self.game = game
         self.add(self.game.all_sprites)
         self.image = pygame.Surface((self.player.feet.width, self.player.feet.height))
+        self.image.set_colorkey(Color.BLACK)
         self.rect = self.image.get_rect()
         self.rect.midbottom = self.player.rect.midbottom
 
@@ -18,12 +19,3 @@ class HitBox(pygame.sprite.Sprite):
         self.rect.midbottom = self.player.rect.midbottom
 
 
-class Mob(pygame.sprite.Sprite):
-
-    def __init__(self, game, x, y):
-        pygame.sprite.Sprite.__init__(self)
-
-        self.game = game
-        self.image = self.game.picture.get_image()
-        self.rect = self.image.get_rect()
-        self.rect.midbottom((x, y))

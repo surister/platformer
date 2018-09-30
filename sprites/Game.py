@@ -2,8 +2,8 @@ import pygame
 import random
 from os import path
 
-from settings import WIDTH, HEIGHT, FPS, Color, PLATFORM_LIST, FONT_NAME, HS_FILE, SPRITESHEET, WORLD_ACC
-from sprites import Player, Platforms, art, hitbox
+from settings import WIDTH, HEIGHT, FPS, Color, PLATFORM_LIST, FONT_NAME, HS_FILE, SPRITESHEET, WORLD_ACC, POW_STR
+from sprites import Player, game_elements, art, hitbox
 
 
 class Game:
@@ -27,7 +27,6 @@ class Game:
         self.path = path.dirname(__file__)
         self.highscore_path = path.join(self.path, HS_FILE)
         self.spritesheet_path = path.join(self.path, SPRITESHEET)
-        self.test_path = path.join(self.path, 'assets/new.png')
         self.snd_path = path.join(self.path, 'snd')
 
         self._load_data()
@@ -40,9 +39,6 @@ class Game:
                 self.highscore = 0
         self.jump_sound = pygame.mixer.Sound(path.join(self.snd_path, 'jump.wav'))
         self.spritesheet = art.Sheet(self.spritesheet_path)
-        self.new_spritesheet = art.Image(self.test_path)
-
-        #self.picture = art.Image('test')
 
     def new(self):
         self.score = 0
@@ -58,7 +54,7 @@ class Game:
 
         for platform in PLATFORM_LIST:
 
-            Platforms.BasePlatform(*platform, game=self, _type=2)
+            game_elements.BasePlatform(*platform, game=self, _type=2)
 
         self._run()
 
@@ -74,6 +70,8 @@ class Game:
     def _update(self):
 
         self.all_sprites.update()
+
+        #  Platform collision, TODO: see why sometimes when going down it won't detect collision.
         if self.player.vel.y > 0:
             hits = pygame.sprite.spritecollide(self.hitbox, self.platforms, False)
 
@@ -88,6 +86,13 @@ class Game:
                     self.player.vel.y = 0
                     self.player.jumping = False
                     self.player.acc.y = WORLD_ACC
+        # Powerups collision.
+        powerups_hits = pygame.sprite.spritecollide(self.player, self.powerups, True)
+        for pow in powerups_hits:
+            if pow.type == 'boost':
+                self.player.vel.y = -POW_STR
+                self.player.jumping = False
+        #  platforms moving up
         if self.player.rect.top <= HEIGHT / 4:
             self.player.pos.y += max(abs(self.player.vel.y), 2)
             for platform in self.platforms:
@@ -106,7 +111,7 @@ class Game:
             self.playing = False
 
         while len(self.platforms) < 4:
-            Platforms.BasePlatform(random.randrange(0, WIDTH - random.randrange(60, 100)), 0, self, random.randint(1, 2))
+            game_elements.BasePlatform(random.randrange(0, WIDTH - random.randrange(60, 100)), 0, self, random.randint(1, 2))
 
     def _events(self):
 
@@ -116,7 +121,7 @@ class Game:
                 self.playing = False
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_SPACE:
-                    self.player.jump_cut()
+                    self.player.jump_cut() # TODO PUt this in to player, not GAME
 
     def _draw(self):
         self.screen.fill(Color.LIGHT_BLUE)

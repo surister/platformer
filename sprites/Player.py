@@ -22,7 +22,7 @@ class Player(pygame.sprite.Sprite):
         self.current_frame = 0
         self.last_update = 0
 
-        self.load_images()
+        self._load_images()
         self.image = self.standing_frames[0]
 
         self.rect = self.image.get_rect()
@@ -32,7 +32,7 @@ class Player(pygame.sprite.Sprite):
         self.vel = vector(0, 0)
         self.acc = vector(0, WORLD_ACC)
 
-    def load_images(self):
+    def _load_images(self):
 
         self.standing_frames = (self.game.spritesheet.get_image(x=614, y=1063, width=120, height=191),
                                 self.game.spritesheet.get_image(x=690, y=406, width=120, height=201))
@@ -62,7 +62,7 @@ class Player(pygame.sprite.Sprite):
                 self.vel.y = -4
 
     def update(self):
-        self.animate()
+        self._animate()
         self.acc.x = 0
 
         #  MOVEMENT STUFF
@@ -114,7 +114,7 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.bottom = bottom
 
-    def animate(self):
+    def _animate(self):
         now = pygame.time.get_ticks()
 
         if self.vel.x != 0:
@@ -135,7 +135,7 @@ class Player(pygame.sprite.Sprite):
                 self._stick_player()
 
         if not self.jumping and not self.walking:
-            if now - self.last_update > 350:
+            if now - self.last_update > 250:
                 self.last_update = now
 
                 self.current_frame = (self.current_frame + 1) % len(self.standing_frames)
