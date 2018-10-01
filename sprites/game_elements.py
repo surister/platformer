@@ -33,6 +33,33 @@ class PowerUp(pygame.sprite.Sprite):
             self.kill()
 
 
+class Cloud(pygame.sprite.Sprite):
+
+    def __init__(self, game):
+        super().__init__()
+        self.game = game
+        self.add(self.game.clouds, self.game.all_sprites)
+
+        # We could just avoid this function call but let's stick with the design pattern
+        self.image = self.game.spritesheet.get_image(0, 1152, 260, 134)
+
+        self.rect = self.image.get_rect()
+        self.rect.x = randrange(WIDTH - self.rect.width)
+        self.rect.y = randrange(-500, -50)
+        self._load_images()
+
+    def _load_images(self):
+
+        scalerino = randrange(50, 100) / 100
+        self.randomized_sprite = pygame.transform.scale(self.image, (int(self.rect.width * scalerino),
+                                                                     int(self.rect.height * scalerino)))
+        self.image = self.randomized_sprite
+
+    def update(self):
+        if self.rect.top > HEIGHT * 2:
+            self.kill()
+
+
 platforms = {1: (0, 288, 380, 94),
              2: (213, 1662, 210, 100)}
 
@@ -118,3 +145,4 @@ class Mob(pygame.sprite.Sprite):
 
             self.current_frame = (self.current_frame + 1) % len(self.flying_frame)
             self.image = self.flying_frame[self.current_frame]
+

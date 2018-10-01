@@ -13,6 +13,7 @@ class Game:
         self.running = True
         self.playing = True
         self.mob_timer = 0
+
         #  Basic pygame vars
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         self.clock = pygame.time.Clock()
@@ -21,7 +22,7 @@ class Game:
         # Basic py game initializations
         pygame.init()
         pygame.mixer.init()
-        pygame.display.set_caption('SUPER JUEGO OMG')
+        pygame.display.set_caption('Suriland')
 
         # Paths
         self.path = path.dirname(__file__)
@@ -48,6 +49,7 @@ class Game:
         self.platforms = pygame.sprite.Group()
         self.powerups = pygame.sprite.Group()
         self.mobs = pygame.sprite.Group()
+        self.clouds = pygame.sprite.Group()
 
         self.player = Player.Player(self)
         self.hitbox = hitbox.HitBox(self, self.player)
@@ -99,9 +101,16 @@ class Game:
             if powerup.type == 'boost':
                 self.player.vel.y = -POW_STR
                 self.player.jumping = False
-        #  platforms moving up if we reach 1/4 height (up)
+        #  platforms moving up if we reach 1/4 height (up) and spawn cloud
         if self.player.rect.top <= HEIGHT / 4:
+            if random.randrange(100) < 10:
+                game_elements.Cloud(self)
+
             self.player.pos.y += max(abs(self.player.vel.y), 2)
+
+            for cloud in self.clouds:
+                cloud.rect.y += max(abs(self.player.vel.y / 2), 2)
+
             for platform in self.platforms:
                 platform.rect.y += max(abs(self.player.vel.y), 2)
                 if platform.rect.top >= HEIGHT:
@@ -135,7 +144,17 @@ class Game:
                     self.player.jump_cut()  # TODO PUt this in to player, not GAME
 
     def _draw(self):
-        self.screen.fill(Color.LIGHT_BLUE)
+        if 0 <= self.score < 150:
+            self.screen.fill(Color.LIGHT_BLUE)
+        if 150 < self.score < 250:
+            self.screen.fill(Color.LIGHT_BLUE2)
+        if 250 < self.score < 350:
+            self.screen.fill(Color.LIGHT_BLUE3)
+        if 350 < self.score < 450:
+            self.screen.fill(Color.LIGHT_BLUE4)
+        if 450 < self.score:
+            self.screen.fill(Color.LIGHT_BLUE5)
+
         self.all_sprites.draw(self.screen)
         self._draw_text(str(self.score), 22, Color.WHITE, WIDTH - 25, 15)
         self._draw_text(f'{round(self.clock.get_fps(), 2)}', 22, Color.WHITE, 35, 15)

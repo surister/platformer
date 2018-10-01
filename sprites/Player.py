@@ -77,10 +77,10 @@ class Player(pygame.sprite.Sprite):
                 self.acc.x = PLAYER_ACC
             if self.keys[pygame.K_SPACE]:
                 if not self.jumping:
-                    pass
                     #  self.game.jump_sound.play()
-                self.jump()
-
+                    self.jump()
+            if self.keys[pygame.K_w]:
+                self.vel.y = -15
         if self.keys[pygame.K_DOWN]:
             self.acc.y = 1.4
             self.down = True
