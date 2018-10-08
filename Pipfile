@@ -4,20 +4,9 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-<<<<<<< HEAD
 pygame = "*"
-=======
-"discord.py" = {ref = "rewrite", git = "https://github.com/Rapptz/discord.py"}
-"72eb2aa" = {file = "https://github.com/Rapptz/discord.py/archive/rewrite.zip"}
-"beautifulsoup4" = "*"
-tabulate = "*"
->>>>>>> 7b0a57f6ba1fdc2288241a493f698b118b47c871
 
 [dev-packages]
 
 [requires]
-<<<<<<< HEAD
 python_version = "3.7"
-=======
-python_version = "3.6.6"
->>>>>>> 7b0a57f6ba1fdc2288241a493f698b118b47c871
