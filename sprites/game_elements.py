@@ -145,4 +145,3 @@ class Mob(pygame.sprite.Sprite):
 
             self.current_frame = (self.current_frame + 1) % len(self.flying_frame)
             self.image = self.flying_frame[self.current_frame]
-
