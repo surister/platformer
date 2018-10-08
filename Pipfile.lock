@@ -1,11 +1,19 @@
 {
     "_meta": {
         "hash": {
+<<<<<<< HEAD
             "sha256": "e172a3e30534a9a0b74742497b40f2ab196a0890d1cb082eb481fb89e384456e"
         },
         "pipfile-spec": 6,
         "requires": {
             "python_version": "3.7"
+=======
+            "sha256": "269abb132c2c378147d0d50d99325b3daafbb536f53f3428359adac3a0cbc94b"
+        },
+        "pipfile-spec": 6,
+        "requires": {
+            "python_version": "3.6.6"
+>>>>>>> 7b0a57f6ba1fdc2288241a493f698b118b47c871
         },
         "sources": [
             {
@@ -16,6 +24,7 @@
         ]
     },
     "default": {
+<<<<<<< HEAD
         "pygame": {
             "hashes": [
                 "sha256:06dc92ccfea33b85f209db3d49f99a2a30c88fe9fb80fa2564cee443ece787b5",
@@ -45,6 +54,30 @@
             ],
             "index": "pypi",
             "version": "==1.9.4"
+=======
+        "72eb2aa": {
+            "file": "https://github.com/Rapptz/discord.py/archive/rewrite.zip"
+        },
+        "beautifulsoup4": {
+            "hashes": [
+                "sha256:194ec62a25438adcb3fdb06378b26559eda1ea8a747367d34c33cef9c7f48d57",
+                "sha256:90f8e61121d6ae58362ce3bed8cd997efb00c914eae0ff3d363c32f9a9822d10",
+                "sha256:f0abd31228055d698bb392a826528ea08ebb9959e6bea17c606fd9c9009db938"
+            ],
+            "index": "pypi",
+            "version": "==4.6.3"
+        },
+        "discord.py": {
+            "git": "https://github.com/Rapptz/discord.py",
+            "ref": "53433bca4895e6409e36863dc18398d6d911c3af"
+        },
+        "tabulate": {
+            "hashes": [
+                "sha256:e4ca13f26d0a6be2a2915428dc21e732f1e44dad7f76d7030b2ef1ec251cf7f2"
+            ],
+            "index": "pypi",
+            "version": "==0.8.2"
+>>>>>>> 7b0a57f6ba1fdc2288241a493f698b118b47c871
         }
     },
     "develop": {}
